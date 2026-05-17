@@ -1,60 +1,38 @@
-# Sistem Gestiune Biblioteca
+Sistem de Gestiune a Activitatii unei Biblioteci
 
-Proiect de gestiune a activitatii unei biblioteci. Sistemul permite gestionarea stocurilor de carti,
-a diferitelor tipuri de abonati (Copil, Student, Premium, Pensionar) si procesarea imprumuturilor cu calcul 
-automat al penalizarilor.
+ Proiectul este o aplicatie creata pentru a gestiona toate activitatile care au loc intr-o biblioteca moderna. Intr-o biblioteca reala exista mii de carti care trebuie tinute in evidenta, mii de abonati care vin si pleaca, dar si foarte multe imprumuturi active ce trebuie monitorizate si actualizate zi de zi.
+ Prima problema (proiectul 1) a fost rezolvata prin crearea unui program ce leaga impreuna trei lucruri esentiale unei biblioteci: Cartile, Abonatii si Imprumuturile.
+ Aplicatia memoreaza aceste date intr-un mod static si executa operatiuni in mod automat. In momentul in care un abonat incearca sa realizeze un imprumut, programul verifica daca acea carte mai este in stoc si scade numarul de carti disponibile. Programul calculeaza si aplica automat penalizarile in momentul in care un utilizator depaseste numarul de zile permise. O balata de penalizari de peste 25 RON sau un abonament expirat va impiedica abonatul din a mai realiza imprumuturi.
+ 
+ In cel de-al doilea proiect am implementat diferite tipuri de clienti, asa ca am transformat clasa Abonati intr-o clasa parinte, iar din aceasta am creat 4 clase derivate: AbonatCopil, AbonatStudent, AbonatPremium, AbonatPensionar.
+Fiecare clasa noua a primit functii virtuale pentru a gestiona datele in mod diferit. Cand salvam un student in fisier, programul scrie si numele universitatii unde invata, iar cand salvam un abonat Premium, se adauga o taxa speciala de mentenanta. Tot in Proiectul 2 am inceput sa folosim comanda "dynamic_cast". Aceasta ne ajuta sa cautam prin lista generala de abonati si sa ii identificam doar pe cei care sunt studenti, pentru a le aplica anumite promotii. Pentru ca lucram cu pointeri si alocare dinamica, am folosit tehnica Copy-and-Swap in clasele mari pentru a fi siguri ca obiectele sunt copiate si sterse corect din memorie.
 
-# Compilare:
-g++ *.cpp -o biblioteca
+ In cel de-al treilea proiect am avut ca scop eliminarea tuturor defectelor din trecut. In aceasta etapa, am implementat doua sabloane de proiectare celebre, numite Singleton si Factory Method. De asemenea, am trecut la programarea generica folosind clase si functii sablon (Templates).
+ 
+  Implementarea Design Patters:
+ -Sablonul 1: Singleton
+ In versiunile anterioare ale programului, clasa principala "GestiuneAbonati" (ce functioneaza ca o baza de date pentru biblioteca) putea fi creata de mai multe ori in functia main. Acest lucru reprezenta un risc foarte mare. Daca din greseala cream doua obiecte de acest tip, aveam doua baze de date diferite in memorie, iar informatiile despre carti si imprumuturi se puteau amesteca.
+ Pentru a repara aceasta problema, am transformat clasa "GestiuneAbonati" intr-un Singleton. Am mutat constructorul clasei in zona privata, ceea ce inseamna ca nimeni din afara clasei nu mai poate scrie comenzi de tipul "new GestiuneAbonati". Pentru a fi siguri ca acest obiect nu poate fi multiplicat sub nicio forma, am sters constructorul de copiere si operatorul=. Singurul mod in care putem folosi clasa acum este prin apelarea functiei statice publice "getInstance()". Aceasta functie creeaza o singura instanta a clasei prima data cand este apelata, iar la urmatoarele apelari returneaza exact acelasi obiect salvat deja in memorie.
+ 
+ -Sablonul 2: Factory Method
+ O alta problema mare pe care o aveam in Proiectul 2 se afla in interiorul functiei "incarcaDinFisier". Acolo aveam o structura foarte lunga de tip "if-else". Programul citea o litera din fisier (C pentru Copil, S pentru Student, P pentru Premium sau R pentru Pensionar) si verifica manual ce obiect trebuie sa creeze cu "new AbonatStudent", "new AbonatCopil" etc. Daca pe viitor doream sa adaugam un nou tip de abonat in aplicatie, eram obligati sa modificam logica de citire.
+ Pentru a rezolva aceasta situatie, am creat clasa "AbonatFactory". Aceasta clasa are o singura functie statica numita creeazaAbonat care primeste litera corespunzatoare tipului si toate datele citite din fisier (nume, prenume, cnp, telefon, varsta, durata, universitate, taxa). Fabrica se uita la litera primita si stie exact ce constructor sa apeleze, trimitand numarul corect de parametri cerut de fisierele noastre header (Abonat Student contine universitatea, Abonat Premium contine taxa).
+ Dupa ce am implementat Factory, functia "incarcaDinFisier" a fost curatata. Acum procesul de citire este complet separat de procesul de creare a obiectelor. 
+ 
+ Programarea Generica: Clase si Functii Sablon (Templates):
+ -Clasa Sablon "Catalog<T>"
+ Inainte de modernizare, clasa "GestiuneAbonati" tinea datele in doi vectori separati din biblioteca standard: "std::vector<Carti*>" si "std::vector<Imprumuturi*>". Pentru fiecare dintre acesti doi vectori trebuia sa scriem functii aproape identice de adaugare si bucle repetitive in destructor pentru a elibera manual memoria ocupata de pointeri. Pentru a sterge acest cod duplicat, am proiectat clasa sablon "Catalog<T>". Aceasta clasa functioneaza ca un container universal care contine un vector de pointeri de tip generic T. Cel mai mare avantaj este ca acest Catalog are un destructor inteligent. In momentul in care aplicatia se inchide si obiectul catalog este distrus, destructorul sau parcurge automat toata lista interna de pointeri, aplica comanda delete pe fiecare element valid si elibereaza memoria RAM instantaneu.
+ In fisierul "GestiuneAbonati.h" am inlocuit vectorii vechi si am creat doua cataloage folosind aceasta matrice: "Catalog<Carti> catalogCarti;"; "Catalog<Imprumuturi> catalogImprumuturi;". 
+ -Functia Sablon "cautaElement":
+ Pe langa clasa sablon, am creat si o functie sablon in interiorul catalogului, folosita pentru a cauta rapid elemente in liste: "template <typename Criteriu, typename Comparator>
+T* cautaElement(Criteriu valoare, Comparator comp);".
+ Aceasta functie primeste o valoare pe care o cautam si o functie anonima speciala care decide daca elementul este cel corect. Am folosit aceasta functie generica in doua situatii diferite din fisierul "GestiuneAbonati.cpp":
+-In functia "gasesteCarte": Cautam in "catalogCarti" folosind ID-ul cartii, iar functia compara sirurile de caractere cu ajutorul functiei clasice "std::strcmp".
+-In functia "gasesteImprumutDupaCarte": Cautam in "catalogImprumuturi" folosind tot un ID de carte, dar de data aceasta functia intra inauntrul obiectului de tip imprumut si verifica daca ID-ul cartii luate coincide cu cel cautat. Datorita acestei functii sablon, am sters toate buclele repetitive de tip for pe care inainte le scriam de mana la fiecare operatiune de cautare.
 
-# Mod de functionare:
-
-La rulare trebuie sa introducem CNP-ul persoanei in nuele careia vrem sa imprumutam sau sa returnam o carte. Avem un switch cu 6 optiuni:
-1) .[a] Inapoi -> navigheaza la stanga prin biblioteca de carti.
-2) .[b] Inainte -> navigheaza la dreapta prin biblioteca de carti
-3) .[i] Imprumuta -> verifica daca abonatul este eligibil sa imprumute (nu are penalizari mai mari de 25 RON si are un abonament activ) si salveaza imprumutul in "imprumuturi.txt".
-4) .[r] Returneaza -> deschide un nou meniu ce arata toate cartile imprumutate de abonat (numerotate de la 1). Utilizatorul trebuie sa introduca numarul corespunzator cartii pe care acesta vrea sa o returneaza. La returnare se va compara perioada de zile a imprumutului (default la 14) cu zilele scurse (folosing functia "Trece o zi"). Daca termenul a fost depasit se aplica o taxa de penalizare.
-5) .[t] Trece o zi -> Scade o zi din abonamentul tuturor abonatilor si adauga o zi timpului scurs fiecarui imprumut.
-6) .[x] Iesire -> Inchide programul.
-
-# Gestiunea diferitelor tipuri de Abonati:
-Abonati: Clasa de baza care gestioneaza datele personale (nume, CNP, telefon) si balanta penalizarilor
-
-Abonat Copil: Penalizari mai mari la scorul de incredere in caz de intarziere.
-
-Abonat Student: Beneficiaza de promotii (prelungiri de abonament) si are reduceri la penalizari.
-
-Abonat Premium: Plateste o taxa de mentenanta, dar are penalizari financiare reduse si bonusuri de scor mai mari.
-
-Abonat Pensionar: Reguli standard de imprumut adaptate categoriei de varsta.
-
-# Gestiunea Resurselor:
-- Carti: Gestioneaza titlul, autorul si stocul disponibil.
-- Imprumuturi: Realizeaza legatura intre un Abonat si o Carte. Calculeaza penalizarile daca perioada
-de returnare este depasita.
-- GestiuneAbonati: Simuleaza trecerea timpului pentru toti abonatii (poate fi folosit la procesarea finalului de zi), aplica bonusuri.
-
-# Gestiune Carti si Imprumuturi:
-Catalog de Carti: Navigare interactiva prin lista de carti disponibile, cu detalii despre autor, an si stoc.
-
-Sistem de Imprumut: Verifica automat daca abonatul are dreptul sa imprumute (verificare abonament expirat sau penalizari financiare neachitate).
-
-Returnare cu Feedback: La returnare, sistemul calculeaza automat zilele scurse si aplica penalizari financiare daca este cazul.
-
-# Sistem Scor de Incredere:
-Fiecare abonat are un Scor de Incredere (de la 0 la 100, initial 60):
-
-+Puncte: Pentru returnarea cartilor la timp (creste reputatia).
-
--Puncte: Pentru intarzieri (scade reputatia si poate bloca imprumuturile viitoare).
-
-# Concepte OOP folosite:
-Abstractizare: Clasa de baza Abonati este abstracta, definind interfata pentru toate tipurile de utilizatori prin metoda pur virtuala clone().
-
-Mostenire: Toate tipurile specifice de abonati mostenesc clasa Abonati.
-
-Polimorfism: Folosirea dynamic cast pentru a aplica logica specifica fiecarui tip de abonat si utilizarea functiilor virtuale (do_print) pentru afisare.
-
-Gestiune Resurse: Implementare Constructor de copiere, Operator= si Destructor pentru a gestiona memoria alocata dinamic pentru char*.
-
-Salvarea: Datele sunt salvate si incarcate automat din fisiere text (abonati.txt, carti.txt, imprumuturi.txt).
+ Bibliografie:
+ 1. https://refactoring.guru/design-patterns/abstract-factory/cpp/example#example-0 - recomandat pe github, explica Abstract Factory si are exemple de cod complete.
+ 2. https://refactoring.guru/design-patterns/singleton/cpp/example#lang-features - recomandat pe github, explica Singleton si are exemple de cod complete.
+ 3. https://www.youtube.com/watch?v=usmdZniV_Yw - Factory Design Pattern Tutorial.
+ 4. https://www.youtube.com/watch?v=p3OQDb4nWfg&t=141s - Templates in Modern C++.
+ 5. https://en.cppreference.com/cpp/language/class_template - Templates explicate + exemple de cod.
