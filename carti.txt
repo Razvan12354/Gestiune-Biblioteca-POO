@@ -1,0 +1,3 @@
+"Iarna Alba" "Marius Vlad" C001 1881 179 0 0
+"Vara" "Ion Vasile" C002 2020 92 1 0
+"Primavara" "Andrei Popescu" C003 190 98 0 1
