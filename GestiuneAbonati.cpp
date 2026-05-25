@@ -242,7 +242,7 @@ void GestiuneAbonati::salveazaAbonatiInFisier(const std::string& numeFisier) {
     if (!f.is_open()) return;
 
     for (auto a : lista) {
-        char tip = 'R'; 
+        char tip = 'N'; 
         if (dynamic_cast<AbonatStudent*>(a)) tip = 'S';
         else if (dynamic_cast<AbonatCopil*>(a)) tip = 'C';
         else if (dynamic_cast<AbonatPremium*>(a)) tip = 'P';
