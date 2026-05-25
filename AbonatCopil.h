@@ -18,8 +18,6 @@ public:
 
     // prietena
     friend void swap(AbonatCopil& first, AbonatCopil& second) noexcept;
-
-    virtual ~AbonatCopil();
 };
 
 #endif

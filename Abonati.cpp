@@ -181,7 +181,6 @@ Abonati& Abonati::operator=(const Abonati& nou) {
 }
 
 Abonati::~Abonati() {
-    std::cout << "[Destructor Abonati] Se elibereaza: " << this->nume << std::endl;
     delete[] this->nume;
     delete[] this->prenume;
     delete[] this->CNP;

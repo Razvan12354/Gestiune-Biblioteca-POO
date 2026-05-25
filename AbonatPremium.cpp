@@ -24,7 +24,3 @@ AbonatPremium& AbonatPremium::operator=(const AbonatPremium& nou) {
     swap(*this, copie);
     return *this;
 }
-
-AbonatPremium::~AbonatPremium() {
-    std::cout << "[Destructor AbonatPremium] Obiect distrus." << std::endl;
-}

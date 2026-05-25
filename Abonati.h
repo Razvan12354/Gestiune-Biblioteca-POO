@@ -56,6 +56,8 @@ public:
     void trecereTimp(int luni);
     void modificaScor(int puncte);
 
+    void reseteazaPenalizari() { this->balantaPenalizari = 0; }
+
     virtual double calculScorSpecific() const { return (double)scorIncredere; }
 
     friend std::ostream& operator<<(std::ostream& out, const Abonati& a);

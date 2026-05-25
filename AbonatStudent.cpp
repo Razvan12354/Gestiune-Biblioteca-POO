@@ -1,7 +1,6 @@
 #include "AbonatStudent.h"
 #include <cstring>
 
-
 // Constructor
 AbonatStudent::AbonatStudent(const char* var_nume, const char* var_prenume, const char* var_cnp, const char* var_nrTelefon,
                          int var_varsta, int var_durataAbonament, const char* var_universitate) : Abonati(var_nume, var_prenume, var_cnp, var_nrTelefon, var_varsta, var_durataAbonament) {
@@ -48,6 +47,5 @@ void AbonatStudent::do_print(std::ostream& out) const {
 
 // Destructor
 AbonatStudent::~AbonatStudent() {
-    std::cout << "[Destructor AbonatStudent] Se elibereaza universitatea: " << this->universitate << std::endl;
     delete[] this->universitate;
 }

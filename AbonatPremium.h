@@ -25,8 +25,6 @@ public:
     AbonatPremium& operator=(const AbonatPremium& nou);
 
     friend void swap(AbonatPremium& first, AbonatPremium& second) noexcept;
-
-    virtual ~AbonatPremium();
 };
 
 #endif

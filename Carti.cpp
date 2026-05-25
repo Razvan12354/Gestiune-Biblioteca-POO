@@ -145,7 +145,6 @@ std::ostream& operator<<(std::ostream& out, const Carti& c) {
 
 // Destructor
 Carti::~Carti() {
-    std::cout << "[Destructor Carti] Se elibereaza: " << this->titlu << std::endl;
     delete[] this->titlu;
     delete[] this->autor;
     delete[] this->idCarte;

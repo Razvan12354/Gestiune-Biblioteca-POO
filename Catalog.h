@@ -12,14 +12,6 @@ private:
 public:
     Catalog() = default;
 
-    // Destructor
-    ~Catalog() {
-        for (T* elem : elemente) {
-            delete elem;
-        }
-        elemente.clear();
-    }
-
     // Adauga un element in catalog
     void adauga(T* elem) {
         if (elem != nullptr) {
@@ -67,6 +59,37 @@ public:
         }
         return nullptr; // Nu s-a gasit nimic
     }
+
+    // Functie friend template
+    template <typename U>
+    friend void afiseazaInfoCatalog(const Catalog<U>& cat, const std::string& eticheta);
+
+    // Destructor
+    ~Catalog() {
+        for (T* elem : elemente) {
+            delete elem;
+        }
+        elemente.clear();
+    }
 };
+
+// Implementare Functie friend template
+template <typename U>
+void afiseazaInfoCatalog(const Catalog<U>& cat, const std::string& eticheta) {
+    std::cout << "[Catalog " << eticheta << "] In acest moment sunt inregistrate " 
+              << cat.elemente.size() << " elemente in memorie.\n";
+}
+
+template <typename T, typename Element>
+int numaraElementeCuConditie(Catalog<T>& catalog, Element conditie) {
+    int contor = 0;
+    for (int i = 0; i < catalog.dimensiune(); ++i) {
+        T* elem = catalog[i];
+        if (elem != nullptr && conditie(elem)) {
+            contor++;
+        }
+    }
+    return contor;
+}
 
 #endif

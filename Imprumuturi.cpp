@@ -25,6 +25,14 @@ Imprumuturi::Imprumuturi(Abonati& var_a, Carti& var_c, const char* var_dataImpru
     this->dataImprumut = new char[strlen(var_dataImprumut) + 1];
     strcpy(this->dataImprumut, var_dataImprumut);
 
+    // Daca cartea e la promotie are termen 21 de zile in loc de 14
+    if (var_c.esteLaPromotie()) {
+        this->perioadaZile = 21; // Primeste 21 de zile
+        std::cout << "\n>>> [PROMO] '" << var_c.getTitlu() << "' este la promotie! Termenul a fost extins la 21 de zile. <<<" << std::endl;
+    } else {
+        this->perioadaZile = var_perioada; // Ramane perioada standard (14 zile)
+    }
+
     // Initializare pointeri si variabile simple
     this->perioadaZile = var_perioada;
     this->esteReturnata = false;
@@ -97,10 +105,16 @@ void Imprumuturi::finalizeazaImprumut(int var_zileReale) {
 
     if (var_zileReale > perioadaZile) {
         int zileIntarziere = var_zileReale - perioadaZile;
-        // Folosim abonatAsociat pentru a accesa scorul de incredere
-        double penalizare = (abonatAsociat->getScorIncredere() < 50) ? 
-                            (taxaPenalizarePeZi * zileIntarziere) : 
-                            (0.75 * taxaPenalizarePeZi * zileIntarziere);
+        StrategiePenalizare* strategie = nullptr;
+
+        if (abonatAsociat->getScorIncredere() < 50) {
+            strategie = new PenalizareStandard();
+        } else {
+            strategie = new PenalizareRedusa();
+        }
+        
+        double penalizare = strategie->calculeazaPenalizare(zileIntarziere, taxaPenalizarePeZi);
+        delete strategie;
         
         abonatAsociat->adaugaPenalizare(penalizare);
         std::cout << "Penalizare de " << penalizare << " RON aplicata pentru " << CNP << std::endl;

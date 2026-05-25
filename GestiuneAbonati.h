@@ -21,6 +21,7 @@ public:
     GestiuneAbonati(const GestiuneAbonati& alta) = delete; // Interzice copierea
     GestiuneAbonati& operator=(const GestiuneAbonati& alta) = delete; // Interzice atribuirea
 
+    // Pentru Singleton
     static GestiuneAbonati& getInstance() {
         static GestiuneAbonati instance; // Creata o singura data la prima apelare
         return instance;
@@ -30,7 +31,7 @@ public:
     ~GestiuneAbonati();
 
     // Metoda pentru adaugat abonati (primeste pointer la baza)
-    void adaugaAbonat(const Abonati& a);
+    void adaugaAbonat(Abonati* a);
 
     // Metoda pentru Trecere timp
     void trecereTimp(int luni);
@@ -71,7 +72,18 @@ public:
 
     void salveazaAbonatiInFisier(const std::string& numeFisier);
 
+    void stergePenalizariAbonat(const std::string& cnpCautat);
+
     Imprumuturi* gasesteImprumutDupaCarte(const char* idCarte);
+
+    void DowngradePremium(const std::string& cnpCautat);
+
+    Catalog<Carti>& getCatalogCarti() { return catalogCarti; }
+    
+    Catalog<Imprumuturi>& getCatalogImprumuturi() { return catalogImprumuturi; }
+
+    ////Prelungeste abonamentul lui abonat cu un numar de zile specificat
+    void prelungesteAbonament(const std::string& cnpCautat, int nrZile);
 };
 
 #endif

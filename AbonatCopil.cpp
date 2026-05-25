@@ -26,7 +26,3 @@ AbonatCopil& AbonatCopil::operator=(const AbonatCopil& nou) {
     }
     return *this;
 }
-
-AbonatCopil::~AbonatCopil() {
-    std::cout << "[Destructor AbonatCopil] Obiect distrus." << std::endl;
-}
