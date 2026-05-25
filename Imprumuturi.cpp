@@ -34,7 +34,6 @@ Imprumuturi::Imprumuturi(Abonati& var_a, Carti& var_c, const char* var_dataImpru
     }
 
     // Initializare pointeri si variabile simple
-    this->perioadaZile = var_perioada;
     this->esteReturnata = false;
     this->carteImprumutata = &var_c;  // Legam pointerul de obiectul primit
     this->abonatAsociat = &var_a;    // Legam pointerul de obiectul primit
